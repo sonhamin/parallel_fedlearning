@@ -31,37 +31,24 @@ class LocalUpdate(object):
     def __init__(self, args, user_num, loss_func=nn.CrossEntropyLoss(), dataset=None, idxs=None):
         self.args = args
         self.user_num = user_num
-        #self.loss_func = loss_func
+        self.loss_func = loss_func
         self.selected_clients = []
         self.ldr_train = DataLoader(DatasetSplit(dataset, idxs), batch_size=self.args.local_bs, shuffle=True)
 
     def train(self, net):
-        net2 = net.cpu()
+        net2 = net.to(self.args.device)
         net2.train()
-                # Lock is acquired in the parent process:
-        #lock = Lock()
         
-        # train and update
         optimizer = torch.optim.SGD(net2.parameters(), lr=self.args.lr, momentum=self.args.momentum)
-        loss22 = nn.CrossEntropyLoss()
-        #print("11")
+        loss22 = self.loss_func
         epoch_loss = []
         for iter in range(self.args.local_ep):
-            #print("22")
             batch_loss = []
             for batch_idx, (images, labels) in enumerate(self.ldr_train):
-                #print("33")
                 images, labels = images.to(self.args.device), labels.to(self.args.device)
-                #print("44")
                 net2.zero_grad()
-                #print("55")
-                #lock.acquire()
                 log_probs = net2(images)
-                #lock.release()
-                #print("66")
-                #loss = self.loss_func(log_probs, labels)
                 loss = loss22(log_probs, labels)
-                #print("77")
                 loss.backward()
                 optimizer.step()
                 if self.args.verbose and batch_idx % 10 == 0:

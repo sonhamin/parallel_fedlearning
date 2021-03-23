@@ -37,17 +37,3 @@ def get_dataloader(data='mnist', test_size=0.5, num_workers=0, batch_size=32, se
     
     return global_train_loader, local_train_loader, test_loader
     
-
-    
-def set_seed(seed):
-    np.random.seed(seed)
-    random.seed(seed)
-    torch.manual_seed(seed)
-    # if you are suing GPU
-    torch.cuda.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)
-
-
-    #torch.backends.cudnn.enabled = False 
-    #torch.backends.cudnn.benchmark = False
-    #torch.backends.cudnn.deterministic = True
